@@ -37,6 +37,11 @@ const FName NAME_Event("Event");
 const FName NAME_Start("Start");
 const FName NAME_Finish("Finish");
 
+FName FSUDSEditorToolkit::DialogueOutputTabName("SUDSDialogueTab");
+FName FSUDSEditorToolkit::VariablesTabName("SUDSVariablesTab");
+FName FSUDSEditorToolkit::DetailsTabName("SUDSDetailsTab");
+FName FSUDSEditorToolkit::LogTabName("SUDSLogTab");
+
 
 class FSUDSDetailRootObjectCustomization : public  IDetailRootObjectCustomization
 {
@@ -128,7 +133,7 @@ void FSUDSEditorToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTa
 
 	WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(INVTEXT("SUDS Editor"));
 
-	InTabManager->RegisterTabSpawner("SUDSDialogueTab", FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	InTabManager->RegisterTabSpawner(DialogueOutputTabName, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
 	{
 		OutputListView = SNew(SListView<TSharedPtr<FSUDSEditorOutputRow>>)
 #if ENGINE_MINOR_VERSION < 5
@@ -188,7 +193,7 @@ void FSUDSEditorToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTa
 	.SetDisplayName(INVTEXT("Dialogue Output"))
 	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
 
-	InTabManager->RegisterTabSpawner("SUDSVariablesTab", FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	InTabManager->RegisterTabSpawner(VariablesTabName, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
 	{
 		VariablesListView = SNew(SListView<TSharedPtr<FSUDSEditorVariableRow>>)
 #if ENGINE_MINOR_VERSION < 5
@@ -259,7 +264,7 @@ void FSUDSEditorToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTa
 	.SetDisplayName(INVTEXT("Variables"))
 	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
 
-	InTabManager->RegisterTabSpawner("SUDSDetailsTab", FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	InTabManager->RegisterTabSpawner(DetailsTabName, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
 	{
 		FPropertyEditorModule& PropertyEditorModule = FModuleManager::Get().LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		FDetailsViewArgs DetailsViewArgs;
@@ -297,7 +302,7 @@ void FSUDSEditorToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTa
 	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
 	
 
-	InTabManager->RegisterTabSpawner("SUDSLogTab", FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
+	InTabManager->RegisterTabSpawner(LogTabName, FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
 	{
 		TraceLog = SNew(SSUDSTraceLog);
 		return SNew(SDockTab)
@@ -336,6 +341,17 @@ void FSUDSEditorToolkit::RegisterTabSpawners(const TSharedRef<FTabManager>& InTa
 
 	//RegenerateMenusAndToolbars();
 		
+	
+}
+
+void FSUDSEditorToolkit::EnsureTabsVisible()
+{
+	// Hard requirement for the dialogue output tab to be open, so restore it if the user had
+	// closed it (probably by accident)
+	if (!TabManager->FindExistingLiveTab(DialogueOutputTabName))
+	{
+		TabManager->TryInvokeTab(DialogueOutputTabName);
+	}
 	
 }
 
@@ -543,6 +559,8 @@ void FSUDSEditorToolkit::OnClose()
 
 void FSUDSEditorToolkit::StartDialogue()
 {
+	// In case the user closed important tabs
+	EnsureTabsVisible();
 	Clear();
 	if (!Dialogue)
 	{

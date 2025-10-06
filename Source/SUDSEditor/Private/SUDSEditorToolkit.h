@@ -281,6 +281,12 @@ private:
 	TSharedPtr<SSUDSTraceLog> TraceLog;
 	TMap<FName, FSUDSValue> ManualOverrideVariables;
 
+	static FName DialogueOutputTabName;
+	static FName DetailsTabName;
+	static FName VariablesTabName;
+	static FName LogTabName;
+	
+
 	const FSlateColor SpeakerColour = FLinearColor(1.0f, 1.0f, 0.6f, 1.0f);
 	const FSlateColor ChoiceColour = FLinearColor(0.4f, 1.0f, 0.4f, 1.0f);
 	const FSlateColor EventColour = FLinearColor(0.2f, 0.6f, 1.0f, 1.0f);
@@ -300,6 +306,7 @@ private:
 	void OnResetVarsCheckStateChanged(ECheckBoxState NewState);
 	FReply AddVariableClicked();
 	void UpdateVariables();
+	void EnsureTabsVisible();
 	void StartDialogue();
 	void DestroyDialogue();
 	void UpdateOutput();
