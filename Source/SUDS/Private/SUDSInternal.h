@@ -22,7 +22,7 @@ inline const TMap<FName, FSUDSValue>& InternalGetGlobalVariables(UWorld* WorldCo
 }
 
 // For our code only
-inline void InternalSetGlobalVariable(UWorld* WorldContext, FName Name, const FSUDSValue& Value, bool bFromScript, int LineNo)
+inline void InternalSetGlobalVariable(UWorld* WorldContext, FName Name, const FSUDSValue& Value, bool bFromScript, const FString& ScriptName, int LineNo)
 {
 	if (auto Sub = GetSUDSSubsystem(WorldContext))
 	{
@@ -33,6 +33,8 @@ inline void InternalSetGlobalVariable(UWorld* WorldContext, FName Name, const FS
 #if WITH_EDITORONLY_DATA
 		// In editor mode, update static global vars since we may be unit testing or in editor tester
 		USUDSSubsystem::Test_DummyGlobalVariables.Add(Name, Value);
+#else
+		checkf(false, TEXT("%s: Attempted to set global variable %s with no world context, did you forget to set the dialogue owner?"), *ScriptName, *Name.ToString());
 #endif
 	}
 }

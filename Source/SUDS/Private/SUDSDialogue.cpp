@@ -319,7 +319,7 @@ USUDSScriptNode* USUDSDialogue::RunSetVariableNode(USUDSScriptNode* Node)
 			FName Identifier;
 			if (USUDSLibrary::IsDialogueVariableGlobal(SetNode->GetIdentifier(), Identifier))
 			{
-				InternalSetGlobalVariable(this->GetWorld(), Identifier, Value, true, SetNode->GetSourceLineNo());
+				InternalSetGlobalVariable(this->GetWorld(), Identifier, Value, true, BaseScript->GetName(), SetNode->GetSourceLineNo());
 			}
 			else
 			{
